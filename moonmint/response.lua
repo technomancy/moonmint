@@ -65,7 +65,7 @@ local function normalizer(_, go)
 end
 
 -- Refactor to use uv.sendfile?
-local function fileImpl(path, sync)
+local function file(path, sync)
     local body, err = fs.ext.readFile(sync, path)
     if not body then
         error(err)
