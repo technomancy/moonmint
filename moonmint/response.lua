@@ -19,7 +19,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --- Utilities for creating HTTP responses.
 -- @module moonmint.response
 
-local mime = require('mimetypes').guess
+local mime = require('moonmint.deps.mimetypes').guess
 local fs = require 'moonmint.fs'
 local headers = require 'moonmint.deps.http-headers'
 local setmetatable = setmetatable
