@@ -1,4 +1,4 @@
-SRC=moonmint.lua moonmint
+SRC=moonmint/*.lua
 
 test: ; lua test.lua
 
