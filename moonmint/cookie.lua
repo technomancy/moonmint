@@ -19,7 +19,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 local byte = string.byte
 local sub = string.sub
 local tonumber = tonumber
-local concat = table.concat
 local assert = assert
 local insert = table.insert
 local type = type
@@ -76,7 +75,7 @@ local function readKVPair(str, i)
     local key = sub(str, kStart, kEnd)
     if charCheck == 61 then -- = sign
         local vStart = skipWhitespace(str, i + 1)
-        i, charCheck = getNext(str, vStart)
+        i = getNext(str, vStart)
         local vEnd = skipWhitespaceBack(str, i - 1)
         local value = sub(str, vStart, vEnd)
         return i + 1, key, value
@@ -101,7 +100,7 @@ local function parseCookie(str)
     return ret
 end
 
-local function makeSetCookie(options)
+local function makeSetCookie(cookie)
     assert(cookie.value, 'Expected cookie value.')
     local str = (cookie.key and (cookie.key .. '=') or '') .. cookie.value
         .. (cookie.expires and '; Expires=' .. cookie.expires or '')
