@@ -19,6 +19,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -- Connection and Request code modified from
 -- https://github.com/luvit/lit/blob/master/deps/coro-http.lua
 
+-- Further modified to remove non-working TLS support; it depended on
+-- openssl APIs that were removed.
+
 --- @classmod Agent
 --
 -- The Agent class is used to make HTTP requests.
@@ -78,13 +81,6 @@ local function connect(options)
     socket:connect(res[1].addr, res[1].port, makeCallback(options.timeout))
     success, err = coroutine.yield()
     if not success then return nil, err end
-    if options.tls then
-        local secureSocket = require('moonmint.deps.secure-socket')
-        socket, err = secureSocket(socket, options.tls)
-        if not socket then
-            return nil, err
-        end
-    end
     local read, write, close = wrapStream(socket)
     return read, write, socket, close
 end
@@ -101,10 +97,10 @@ local function clearConnections()
     connections = {}
 end
 
-local function getConnection(host, port, tls)
+local function getConnection(host, port)
     for i = #connections, 1, -1 do
         local connection = connections[i]
-        if connection.host == host and connection.port == port and connection.tls == tls then
+        if connection.host == host and connection.port == port then
             table.remove(connections, i)
             -- make sure the connection is still alive before reusing it.
             if not connection.socket:is_closing() then
@@ -117,7 +113,6 @@ local function getConnection(host, port, tls)
     local read, write, socket = assert(connect {
         host = host,
         port = port,
-        tls = tls
     })
     local updateDecoder, updateEncoder
     read, updateDecoder = coroWrap.reader(read, httpCodec.decoder())
@@ -126,7 +121,6 @@ local function getConnection(host, port, tls)
         socket = socket,
         host = host,
         port = port,
-        tls = tls,
         read = read,
         write = write,
         updateEncoder = updateEncoder,
@@ -176,9 +170,9 @@ local function makeHead(self, host, path, body)
     return head
 end
 
-local function requestImpl(self, tls, hostname, port, head, body)
+local function requestImpl(self, hostname, port, head, body)
     -- Get a connection
-    local connection = getConnection(hostname, port, tls)
+    local connection = getConnection(hostname, port)
     local read = connection.read
     local write = connection.write
 
@@ -193,7 +187,7 @@ local function requestImpl(self, tls, hostname, port, head, body)
         -- TODO: think about if this could resend requests with side effects and cause
         -- them to double execute in the remote server.
         if connection.reused then
-            return requestImpl(self, tls, hostname, port, head, body)
+            return requestImpl(self, hostname, port, head, body)
         end
         error("connection closed")
     end
@@ -229,7 +223,7 @@ local function requestImpl(self, tls, hostname, port, head, body)
             local key, location = unpack(res[i])
             if key:lower() == "location" then
                 head.path = location
-                return requestImpl(self, tls, hostname, port, head, body)
+                return requestImpl(self, hostname, port, head, body)
             end
         end
     end
@@ -262,10 +256,9 @@ local function sendImpl(self, body)
     end
 
     -- Get port, host, and protocol
-    local tls = proto == 'https://'
     local host, port = match(hostname, '^([^:]+):?(%d*)$')
     if port == '' then
-        port = tls and 443 or 80
+        port = 80
     else
         port = tonumber(port) or 80
     end
@@ -276,7 +269,7 @@ local function sendImpl(self, body)
     end
 
     local head = makeHead(self, host, path, body)
-    local resHead, resBody = requestImpl(self, tls, host, port, head, body)
+    local resHead, resBody = requestImpl(self, host, port, head, body)
 
     return response {
         body = resBody,

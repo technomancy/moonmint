@@ -51,7 +51,7 @@ end
 
 local function agentTester(cb)
     local moonmint = require 'moonmint'
-    local agent = require 'moonmint.agent'
+    local agent = require 'tools.agent'
     local testServer = moonmint():startLater {
         errHand = false
     }
