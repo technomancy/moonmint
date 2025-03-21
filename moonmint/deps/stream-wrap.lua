@@ -1,3 +1,13 @@
+--[[lit-meta
+  name = "luvit/coro-channel"
+  version = "3.0.5"
+  homepage = "https://github.com/luvit/lit/blob/master/deps/coro-channel.lua"
+  description = "An adapter for wrapping uv streams as coro-streams."
+  tags = {"coro", "adapter"}
+  license = "MIT"
+  author = { name = "Tim Caswell" }
+]]
+
 local corunning = coroutine.running
 
 local function makeCloser(socket)

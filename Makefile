@@ -1,6 +1,7 @@
 SRC=moonmint/*.lua
+LUA ?= lua
 
-test: ; lua test.lua
+test: ; $(LUA) test.lua
 
 lint: ; luacheck $(SRC)
 

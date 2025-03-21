@@ -1,7 +1,5 @@
 # moonmint
 
-![Travis](https://travis-ci.org/bakpakin/moonmint.svg?branch=master)
-
 __moonmint__ is an HTTP web framework for Lua.
 Use complex routing, static file serving, and templating with a
 minimal code base. Harness the power of libuv to perform asynchronous operations.
@@ -10,37 +8,23 @@ Check out the [wiki](https://github.com/bakpakin/moonmint/wiki) for more informa
 
 ## Features
 
-* Simple and flexible express-like routing
+* Simple and flexible routing
 * Middleware
 * Static file server
 * Nonblocking operations with coroutines and libuv
-* Supports Lua 5.2, 5.3, LuaJIT 2.0, LuaJIT 2.1
-* Powerful asynchronous agent for making HTTP requests
+* Supports PUC Lua 5.2 - 5.4, LuaJIT 2.0, LuaJIT 2.1
 * Templating engine
 
 ## Quick Install
 
-In order to install moonmint, the following dependencies are needed.
-
-* Luarocks (the package manager)
-* OpenSSL (for the bkopenssl dependecy)
-* CMake (for the luv libuv binding)
-
-Also, make sure that the Lua dev packages are installed on linux.
-On OSX using brew openssl, you may need to provide the openssl
-directory to luarocks to install bkopenssl.
-
-Use luarocks to install
-```
-luarocks install --server=http://luarocks.org/dev moonmint
-```
-
-See the wiki for more information.
+Outside Lua, the main dependency is [luv](https://github.com/luvit/luv).
+I recommend installing it with apt if possible. If not, luarocks might work.
 
 ## Example
 
-moonmint is really simple - probably the simplest way to get a running webserver in Lua out there!
-Install with luarocks,  write your server script, and run it!
+moonmint is really simple - probably the simplest way to get a running
+webserver in Lua out there!
+
 The following example servers serve "Hello, World!" on the default port 8080.
 
 ```lua
@@ -59,17 +43,24 @@ require('moonmint')()
     :get('/', 'Hello, World!')
     :start()
 ```
+
 ## Credits
 
-A lot of code was modified from the [Luvit](https://luvit.io/) project and from [Tim Caswell](https://twitter.com/creationix), the main author.
 moonmint depends on the luv library, a Lua binding to libuv.
 
-Another important dependency is lua-openssl, which is a very useful openssl binding for Lua created and maintained
-by [George Zhao](https://github.com/zhaozg). Many thanks.
+Most of the code in the `moonmint/deps` directory is taken either from
+the [Luvit](https://luvit.io/) or [lit](https://github.com/luvit/lit) projects.
 
-Bundled the mimetypes dependency under `moonmint/deps/mimetypes.lua` since
-the original repository has disappeared.
+The exception is the `mimetypes` module whose original repo was deleted but
+now lives under [lunarmodules](https://github.com/lunarmodules/lua-mimetypes).
 
 ## License
 
-MIT
+Moonmint itself is released under the MIT license
+Copyright © 2015-2025 Calvin Rose and contributors
+
+Some portions taken from Luvit/lit released under the Apache 2.0 license
+Copyright © 2012 The Luvit Authors.
+
+mimetypes.lua released under the MIT license
+Copyright © 2011 Matthew "LeafStorm" Frazier
